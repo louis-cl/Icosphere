@@ -62,15 +62,13 @@ void OGLWidget::initializeGL()
     // VERTEX VBO
     m_vertex_vbo.bind();
     m_vertex_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    assert(sphere.n_vertices() > 0);
     m_vertex_vbo.allocate(sphere.vertices(),
-        sphere.n_vertices() * static_cast<int>(sizeof(QVector3D)));
+        static_cast<int>(sphere.n_vertices() * sizeof(QVector3D)));
 
     m_index_vbo.bind();
     m_index_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    assert(sphere.n_indices() > 0);
     m_index_vbo.allocate(sphere.indices(),
-        sphere.n_indices() *  static_cast<int>(sizeof(GLushort)));
+        static_cast<int>(3 * sphere.n_triangles() * sizeof(GLushort)));
 
     m_program->enableAttributeArray(0);
     m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
