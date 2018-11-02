@@ -1,9 +1,14 @@
-attribute vec4 vertex;
+attribute vec3 vertex;
 
+
+uniform mat4 modelMatrix;
+uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
-uniform mat4 mvMatrix;
-uniform mat3 normalMatrix;
+
+varying vec3 vert;
 
 void main() {
-    gl_Position = projMatrix * mvMatrix * vertex;
+    vec4 v_model = modelMatrix * vec4(vertex, 1.0);
+    vert = v_model.xyz;
+    gl_Position = projMatrix * viewMatrix * v_model;
 }

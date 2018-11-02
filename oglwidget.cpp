@@ -5,6 +5,7 @@ OGLWidget::OGLWidget(QWidget *parent)
     , m_xRot(0)
     , m_yRot(0)
     , m_zRot(0)
+    , m_sphere(0)
     , m_vertex_vbo(QOpenGLBuffer::VertexBuffer)
     , m_index_vbo(QOpenGLBuffer::IndexBuffer)
     , m_program(nullptr)
@@ -50,11 +51,8 @@ void OGLWidget::initializeGL()
     m_program->bind();
 
     m_projMatrixLoc = m_program->uniformLocation("projMatrix");
-    m_mvMatrixLoc = m_program->uniformLocation("mvMatrix");
-    m_normalMatrixLoc = m_program->uniformLocation("normalMatrix");
-
-    // ADD DATA
-    Icosphere sphere(0);
+    m_viewMatrixLoc = m_program->uniformLocation("viewMatrix");
+    m_modelMatrixLoc = m_program->uniformLocation("modelMatrix");
 
     // START VAO
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
@@ -62,13 +60,13 @@ void OGLWidget::initializeGL()
     // VERTEX VBO
     m_vertex_vbo.bind();
     m_vertex_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_vertex_vbo.allocate(sphere.vertices(),
-        static_cast<int>(sphere.n_vertices() * sizeof(QVector3D)));
+    m_vertex_vbo.allocate(m_sphere.vertices(),
+        static_cast<int>(m_sphere.n_vertices() * sizeof(QVector3D)));
 
     m_index_vbo.bind();
     m_index_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_index_vbo.allocate(sphere.indices(),
-        static_cast<int>(3 * sphere.n_triangles() * sizeof(GLushort)));
+    m_index_vbo.allocate(m_sphere.indices(),
+        static_cast<int>(3 * m_sphere.n_triangles() * sizeof(GLushort)));
 
     m_program->enableAttributeArray(0);
     m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
@@ -78,14 +76,18 @@ void OGLWidget::initializeGL()
     m_world.setToIdentity();
     m_proj.setToIdentity();
     m_camera.setToIdentity();
-    m_camera.translate(0, 0, -1);
+    m_camera.translate(0, 0, -2);
 }
 
 void OGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // display only lines
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+
     glClearColor(0.3f,0.3f,0.3f,1.0);
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
 
 
@@ -98,11 +100,13 @@ void OGLWidget::paintGL()
     m_program->bind();
 
     m_program->setUniformValue(m_projMatrixLoc, m_proj);
-    m_program->setUniformValue(m_mvMatrixLoc, m_camera * m_world);
-    QMatrix3x3 normalMatrix = m_world.normalMatrix();
-    m_program->setUniformValue(m_normalMatrixLoc, normalMatrix);
+    m_program->setUniformValue(m_viewMatrixLoc, m_camera);
+    m_program->setUniformValue(m_modelMatrixLoc, m_world);
 
-    glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, nullptr);
+    glDrawElements(GL_TRIANGLES,
+                   static_cast<int>(3*m_sphere.n_triangles()),
+                   GL_UNSIGNED_SHORT,
+                   nullptr);
 
     m_program->release();
 }

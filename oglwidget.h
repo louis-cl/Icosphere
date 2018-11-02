@@ -39,6 +39,9 @@ private:
     // last click position
     QPoint m_lastPos;
 
+    // data
+    Icosphere m_sphere;
+
     // opengl objects
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vertex_vbo;
@@ -47,8 +50,8 @@ private:
 
     // uniform locations
     int m_projMatrixLoc;
-    int m_mvMatrixLoc;
-    int m_normalMatrixLoc;
+    int m_viewMatrixLoc;
+    int m_modelMatrixLoc;
 
     // P, V, M matrices
     QMatrix4x4 m_proj, m_camera, m_world;
