@@ -5,11 +5,13 @@ OGLWidget::OGLWidget(QWidget *parent)
     , m_xRot(0)
     , m_yRot(0)
     , m_zRot(0)
+    , wireframe(false)
     , m_sphere(0)
     , m_vertex_vbo(QOpenGLBuffer::VertexBuffer)
     , m_index_vbo(QOpenGLBuffer::IndexBuffer)
     , m_program(nullptr)
 {
+    setFocusPolicy(Qt::StrongFocus); // get keyboard event
 }
 
 OGLWidget::~OGLWidget()
@@ -53,6 +55,7 @@ void OGLWidget::initializeGL()
     m_projMatrixLoc = m_program->uniformLocation("projMatrix");
     m_viewMatrixLoc = m_program->uniformLocation("viewMatrix");
     m_modelMatrixLoc = m_program->uniformLocation("modelMatrix");
+    m_wireframeLoc = m_program->uniformLocation("wireframe");
 
     // START VAO
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
@@ -84,11 +87,12 @@ void OGLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // display only lines
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    if (wireframe) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glClearColor(0.3f,0.3f,0.3f,1.0);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
 
 
     m_world.setToIdentity();
@@ -102,6 +106,7 @@ void OGLWidget::paintGL()
     m_program->setUniformValue(m_projMatrixLoc, m_proj);
     m_program->setUniformValue(m_viewMatrixLoc, m_camera);
     m_program->setUniformValue(m_modelMatrixLoc, m_world);
+    m_program->setUniformValue(m_wireframeLoc, wireframe);
 
     glDrawElements(GL_TRIANGLES,
                    static_cast<int>(3*m_sphere.n_triangles()),
@@ -144,3 +149,10 @@ void OGLWidget::mouseMoveEvent(QMouseEvent * event)
     m_lastPos = event->pos();
 }
 
+void OGLWidget::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Space) {
+        wireframe = !wireframe;
+        update();
+    }
+}

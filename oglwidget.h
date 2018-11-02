@@ -9,6 +9,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QMatrix4x4>
 #include <QMouseEvent>
+#include <QKeyEvent>
 
 #include "icosphere.h"
 
@@ -31,6 +32,7 @@ protected:
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     static void normalizeAngle(int &angle);
@@ -38,6 +40,8 @@ private:
     int m_xRot, m_yRot, m_zRot;
     // last click position
     QPoint m_lastPos;
+    // display wireframe
+    bool wireframe;
 
     // data
     Icosphere m_sphere;
@@ -52,6 +56,8 @@ private:
     int m_projMatrixLoc;
     int m_viewMatrixLoc;
     int m_modelMatrixLoc;
+
+    int m_wireframeLoc;
 
     // P, V, M matrices
     QMatrix4x4 m_proj, m_camera, m_world;

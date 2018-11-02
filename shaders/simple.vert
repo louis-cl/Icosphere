@@ -1,5 +1,5 @@
+#version 330
 attribute vec3 vertex;
-
 
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
