@@ -10,6 +10,8 @@
 #include <QMatrix4x4>
 #include <QMouseEvent>
 
+#include "icosphere.h"
+
 class OGLWidget: public QOpenGLWidget, protected QOpenGLFunctions
 {
 public:
@@ -32,7 +34,6 @@ protected:
 
 private:
     static void normalizeAngle(int &angle);
-
     // rotation euler angles
     int m_xRot, m_yRot, m_zRot;
     // last click position

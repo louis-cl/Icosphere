@@ -54,15 +54,7 @@ void OGLWidget::initializeGL()
     m_normalMatrixLoc = m_program->uniformLocation("normalMatrix");
 
     // ADD DATA
-    QVector3D vertices[] = {
-        QVector3D(0.0, 0.5, 0.0),
-        QVector3D(0.5, -0.5, 0.0),
-        QVector3D(-0.5, -0.5, 0.0)
-    };
-
-    GLushort indices[] = {
-        0,1,2 // THE triangle
-    };
+    Icosphere sphere(0);
 
     // START VAO
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
@@ -70,11 +62,15 @@ void OGLWidget::initializeGL()
     // VERTEX VBO
     m_vertex_vbo.bind();
     m_vertex_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_vertex_vbo.allocate(vertices, sizeof(vertices));
+    assert(sphere.n_vertices() > 0);
+    m_vertex_vbo.allocate(sphere.vertices(),
+        sphere.n_vertices() * static_cast<int>(sizeof(QVector3D)));
 
     m_index_vbo.bind();
     m_index_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_index_vbo.allocate(indices, sizeof(indices));
+    assert(sphere.n_indices() > 0);
+    m_index_vbo.allocate(sphere.indices(),
+        sphere.n_indices() *  static_cast<int>(sizeof(GLushort)));
 
     m_program->enableAttributeArray(0);
     m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
