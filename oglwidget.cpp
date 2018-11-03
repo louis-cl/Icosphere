@@ -6,7 +6,7 @@ OGLWidget::OGLWidget(QWidget *parent)
     , m_yRot(0)
     , m_zRot(0)
     , wireframe(false)
-    , m_sphere(4)
+    , m_sphere(0)
     , m_vertex_vbo(QOpenGLBuffer::VertexBuffer)
     , m_index_vbo(QOpenGLBuffer::IndexBuffer)
     , m_program(nullptr)
@@ -59,17 +59,9 @@ void OGLWidget::initializeGL()
 
     // START VAO
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
-
-        // VERTEX VBO
-    m_vertex_vbo.bind();
-    m_vertex_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_vertex_vbo.allocate(m_sphere.vertices(),
-        static_cast<int>(m_sphere.n_vertices() * sizeof(QVector3D)));
-
-    m_index_vbo.bind();
-    m_index_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_index_vbo.allocate(m_sphere.indices(),
-        static_cast<int>(3 * m_sphere.n_triangles() * sizeof(GLushort)));
+    m_vertex_vbo.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+    m_index_vbo.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+    loadSphere();
 
     m_program->enableAttributeArray(0);
     m_program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
@@ -122,6 +114,16 @@ void OGLWidget::resizeGL(int w, int h)
     m_proj.perspective(90.0f, GLfloat(w) / h, 0.01f, 100.0f);
 }
 
+void OGLWidget::loadSphere() {
+    // VERTEX VBO
+    m_vertex_vbo.bind();
+    m_vertex_vbo.allocate(m_sphere.vertices(),
+        static_cast<int>(m_sphere.n_vertices() * sizeof(QVector3D)));
+    m_index_vbo.bind();
+    m_index_vbo.allocate(m_sphere.indices(),
+        static_cast<int>(3 * m_sphere.n_triangles() * sizeof(GLushort)));
+}
+
 void OGLWidget::mousePressEvent(QMouseEvent * event)
 {
     m_lastPos = event->pos();
@@ -154,5 +156,15 @@ void OGLWidget::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_Space) {
         wireframe = !wireframe;
         update();
+    } else if (event->key() == Qt::Key_Up) {
+        m_sphere = Icosphere(m_sphere.level() + 1);
+        loadSphere();
+        update();
+    } else if (event->key() == Qt::Key_Down) {
+        if (m_sphere.level() > 0) {
+            m_sphere = Icosphere(m_sphere.level() - 1);
+            loadSphere();
+            update();
+        }
     }
 }

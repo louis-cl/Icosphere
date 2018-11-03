@@ -44,6 +44,7 @@ private:
     bool wireframe;
 
     // data
+    void loadSphere();
     Icosphere m_sphere;
 
     // opengl objects

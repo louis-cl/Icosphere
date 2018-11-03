@@ -13,6 +13,10 @@ public:
     using Vertex = QVector3D;
 
     Icosphere(unsigned int level);
+
+    unsigned int level() const {
+        return m_level;
+    }
     const Vertex *vertices() const {
         return &m_vertices[0];
     }
@@ -48,6 +52,8 @@ private:
 
     void icosahedron();
     void subdivide();
+
+    unsigned int m_level;
     VertexList m_vertices;
     TriangleList m_triangles;
 };

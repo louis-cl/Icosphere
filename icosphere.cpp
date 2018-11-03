@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 Icosphere::Icosphere(unsigned int level)
+    : m_level(level)
 {
     icosahedron(); // level 0
     for (unsigned int i = 0; i < level; ++i)
