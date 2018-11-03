@@ -6,7 +6,7 @@ OGLWidget::OGLWidget(QWidget *parent)
     , m_yRot(0)
     , m_zRot(0)
     , wireframe(false)
-    , m_sphere(0)
+    , m_sphere(4)
     , m_vertex_vbo(QOpenGLBuffer::VertexBuffer)
     , m_index_vbo(QOpenGLBuffer::IndexBuffer)
     , m_program(nullptr)
@@ -60,7 +60,7 @@ void OGLWidget::initializeGL()
     // START VAO
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
 
-    // VERTEX VBO
+        // VERTEX VBO
     m_vertex_vbo.bind();
     m_vertex_vbo.setUsagePattern(QOpenGLBuffer::StaticDraw);
     m_vertex_vbo.allocate(m_sphere.vertices(),
